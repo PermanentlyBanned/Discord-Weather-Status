@@ -6,8 +6,9 @@ import os
 
 discord_token = os.getenv("DISCORD_TOKEN")
 weather_api_key = os.getenv("WEATHER_API_KEY")
-latitude = float(os.getenv("LATITUDE"))
-longitude = float(os.getenv("LONGITUDE"))
+
+latitude = os.getenv("LATITUDE")
+longitude = os.getenv("LONGITUDE")
 
 local_tz = timezone("Europe/Berlin")
 
@@ -41,36 +42,30 @@ def get_weather_emoji(weather_description, current_time, sunrise_time, sunset_ti
     return weather_emoji
 
 def get_weather_and_sun_times():
-    weather_url = f"https://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={latitude},{longitude}&days=1"
+    weather_url = f"http://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={latitude},{longitude}&days=1"
     response = requests.get(weather_url)
     if response.status_code == 200:
         weather_data = response.json()
-        try:
-            weather_main = weather_data['current']['condition']['text'].lower()
-            sunrise_time_str = weather_data['forecast']['forecastday'][0]['astro']['sunrise']
-            sunset_time_str = weather_data['forecast']['forecastday'][0]['astro']['sunset']
+        weather_description = weather_data['current']['condition']['text'].lower()
 
-            sunrise_time = datetime.strptime(sunrise_time_str, '%I:%M %p').time()
-            sunset_time = datetime.strptime(sunset_time_str, '%I:%M %p').time()
+        sunrise_time_str = weather_data['forecast']['forecastday'][0]['astro']['sunrise']
+        sunset_time_str = weather_data['forecast']['forecastday'][0]['astro']['sunset']
 
-            return weather_main, sunrise_time, sunset_time
-        except KeyError as e:
-            print(f"Key error: {e}")
-        except ValueError as e:
-            print(f"Value error: {e}")
-        except Exception as e:
-            print(f"Unexpected error: {e}")
+        sunrise_time = datetime.strptime(sunrise_time_str, '%I:%M %p').time()
+        sunset_time = datetime.strptime(sunset_time_str, '%I:%M %p').time()
+
+        return weather_description, sunrise_time, sunset_time
     else:
-        print(f"Weather API error: {response.status_code} - {response.text}")
-    return "Clear", None, None
+        return "unknown", None, None
 
-previous_status = None
+previous_time = None
+previous_weather_emoji = None
 last_weather_update = time.time()
 
 while True:
     current_time = get_current_time()
 
-    if time.time() - last_weather_update > 1800 or previous_status is None:
+    if time.time() - last_weather_update > 1800 or previous_weather_emoji is None:
         weather_description, sunrise_time, sunset_time = get_weather_and_sun_times()
         last_weather_update = time.time()
 
