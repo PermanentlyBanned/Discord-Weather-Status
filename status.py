@@ -69,14 +69,19 @@ last_weather_update = time.time()
 
 while True:
     current_time = get_current_time()
+
     if time.time() - last_weather_update > 1800 or previous_status is None:
-        weather_main, sunrise_time, sunset_time = get_weather_and_sun_times()
+        weather_description, sunrise_time, sunset_time = get_weather_and_sun_times()
         last_weather_update = time.time()
+
     current_time_obj = datetime.strptime(current_time, "%H:%M").time()
-    weather_emoji = get_weather_emoji(weather_main, current_time_obj, sunrise_time, sunset_time)
+
+    weather_emoji = get_weather_emoji(weather_description, current_time_obj, sunrise_time, sunset_time)
     status_message = f"{weather_emoji} | {current_time}"
-    if status_message != previous_status:
+
+    if status_message != previous_time:
         change_status(discord_token, status_message)
         print(f"Status updated to: {status_message}")
-        previous_status = status_message
+        previous_time = status_message
+
     time.sleep(1)
