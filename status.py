@@ -41,7 +41,7 @@ def get_weather_emoji(weather_description, current_time, sunrise_time, sunset_ti
     return weather_emoji
 
 def get_weather_and_sun_times():
-    weather_url = f"http://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={latitude},{longitude}&aqi=no"
+    weather_url = f"http://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={latitude},{longitude}&days=1"
     response = requests.get(weather_url)
     if response.status_code == 200:
         weather_data = response.json()
