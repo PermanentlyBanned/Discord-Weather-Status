@@ -45,22 +45,40 @@ def get_weather_and_sun_times():
         weather_data = response.json()
         try:
             weather_main = weather_data['current']['condition']['text']
-            sunrise_time = datetime.strptime(weather_data['forecast']['forecastday'][0]['astro']['sunrise'], '%I:%M %p').time()
-            sunset_time = datetime.strptime(weather_data['forecast']['forecastday'][0]['astro']['sunset'], '%I:%M %p').time()
-            return weather_main, sunrise_time, sunset_time
+            return weather_main
         except (KeyError, ValueError) as e:
             print(f"Error parsing weather data: {e}")
     else:
         print(f"Weather API error: {response.status_code} - {response.text}")
-    return "Clear", None, None
+    return "Clear"
+
+def get_sun_times():
+    sun_url = f"https://api.sunrise-sunset.org/json?lat={latitude}&lng={longitude}&formatted=0"
+    response = requests.get(sun_url)
+    if response.status_code == 200:
+        sun_data = response.json()
+        try:
+            sunrise_time = datetime.fromisoformat(sun_data['results']['sunrise']).astimezone(local_tz).time()
+            sunset_time = datetime.fromisoformat(sun_data['results']['sunset']).astimezone(local_tz).time()
+            return sunrise_time, sunset_time
+        except (KeyError, ValueError) as e:
+            print(f"Error parsing sun times data: {e}")
+    else:
+        print(f"Sun times API error: {response.status_code} - {response.text}")
+    return None, None
 
 previous_status = None
 last_weather_update = time.time()
+last_sun_update = 0
+sunrise_time, sunset_time = get_sun_times()
 
 while True:
     current_time = get_current_time()
+    if time.time() - last_sun_update > 86400:  # Update sun times once a day
+        sunrise_time, sunset_time = get_sun_times()
+        last_sun_update = time.time()
     if time.time() - last_weather_update > 1800 or previous_status is None:
-        weather_main, sunrise_time, sunset_time = get_weather_and_sun_times()
+        weather_main = get_weather_and_sun_times()
         last_weather_update = time.time()
     current_time_obj = datetime.strptime(current_time, "%H:%M").time()
     weather_emoji = get_weather_emoji(weather_main, current_time_obj, sunrise_time, sunset_time)
