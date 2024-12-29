@@ -26,7 +26,7 @@ def get_weather_emoji(weather_main, current_time, sunrise_time, sunset_time):
     if sunrise_time is None or sunset_time is None:
         is_daytime = True
     else:
-        is_daytime = sunrise_time <= current_time <= sunset_time
+        is_daytime = sunrise_time <= current_time < sunset_time
 
     weather_to_emoji = {
         "Clear": "☀️" if is_daytime else "🌙",
