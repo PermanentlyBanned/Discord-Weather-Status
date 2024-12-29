@@ -4,10 +4,11 @@ services:
   python-app:
     build: .
     environment:
-      - DISCORD_TOKEN
-      - WEATHER_API_KEY
-      - LATITUDE
-      - LONGITUDE
+      - DISCORD_TOKEN=
+      - WEATHER_API_KEY=
+      - LATITUDE=
+      - LONGITUDE=
+      - STATUS_MESSAGE_FORMAT={weather_emoji} | {current_time}
     volumes:
       - .:/app
     restart: always

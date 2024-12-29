@@ -9,6 +9,7 @@ weather_api_key = os.getenv("WEATHER_API_KEY")
 latitude = os.getenv("LATITUDE")
 longitude = os.getenv("LONGITUDE")
 local_tz = timezone("Europe/Berlin")
+status_message_format = os.getenv("STATUS_MESSAGE_FORMAT")
 
 def change_status(token, message):
     headers = {'authorization': token}
@@ -72,7 +73,7 @@ while True:
         last_weather_update = time.time()
     current_time_obj = datetime.strptime(current_time, "%H:%M").time()
     weather_emoji = get_weather_emoji(weather_description, current_time_obj, sunrise_time, sunset_time)
-    status_message = f"{weather_emoji} | {current_time}"
+    status_message = status_message_format.format(weather_emoji=weather_emoji, current_time=current_time)
     if status_message != previous_time:
         change_status(discord_token, status_message)
         previous_time = status_message
