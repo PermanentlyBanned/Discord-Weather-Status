@@ -63,20 +63,17 @@ def get_weather_and_sun_times():
         logging.error(f"Failed to fetch weather data: {e}")
         return "unknown", None, None
 
-def main():
-    previous_time, previous_weather_emoji, last_weather_update = None, None, time.time()
-    while True:
-        current_time = get_current_time()
-        if time.time() - last_weather_update > 1800 or previous_weather_emoji is None:
-            weather_description, sunrise_time, sunset_time = get_weather_and_sun_times()
-            last_weather_update = time.time()
-        current_time_obj = datetime.strptime(current_time, "%H:%M").time()
-        weather_emoji = get_weather_emoji(weather_description, current_time_obj, sunrise_time, sunset_time)
-        status_message = f"{weather_emoji} | {current_time}"
-        if status_message != previous_time:
-            change_status(discord_token, status_message)
-            previous_time = status_message
-        time.sleep(1)
+previous_time, previous_weather_emoji, last_weather_update = None, None, time.time()
 
-if __name__ == "__main__":
-    main()
+while True:
+    current_time = get_current_time()
+    if time.time() - last_weather_update > 1800 or previous_weather_emoji is None:
+        weather_description, sunrise_time, sunset_time = get_weather_and_sun_times()
+        last_weather_update = time.time()
+    current_time_obj = datetime.strptime(current_time, "%H:%M").time()
+    weather_emoji = get_weather_emoji(weather_description, current_time_obj, sunrise_time, sunset_time)
+    status_message = f"{weather_emoji} | {current_time}"
+    if status_message != previous_time:
+        change_status(discord_token, status_message)
+        previous_time = status_message
+    time.sleep(1)
