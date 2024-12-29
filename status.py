@@ -22,21 +22,23 @@ def get_current_time():
     current_time = datetime.now(local_tz)
     return current_time.strftime("%H:%M")
 
-def get_weather_emoji(weather_main, current_time, sunrise_time, sunset_time):
-    if sunrise_time is None or sunset_time is None:
-        is_daytime = True
+def get_weather_emoji(weather_description, current_time, sunrise_time, sunset_time):
+    if "clear" in weather_description or "sunny" in weather_description:
+        weather_emoji = "☀️" if sunrise_time <= current_time <= sunset_time else "🌙"
+    elif "cloud" in weather_description:
+        weather_emoji = "☁️"
+    elif "rain" in weather_description or "drizzle" in weather_description:
+        weather_emoji = "🌧️"
+    elif "thunderstorm" in weather_description:
+        weather_emoji = "⛈️"
+    elif "snow" in weather_description:
+        weather_emoji = "❄️"
+    elif "mist" in weather_description or "fog" in weather_description:
+        weather_emoji = "🌫️"
     else:
-        is_daytime = sunrise_time <= current_time <= sunset_time
+        weather_emoji = "🌈"
 
-    weather_to_emoji = {
-        "Clear": "☀️" if is_daytime else "🌙",
-        "Clouds": "☁️",
-        "Rain": "🌧️",
-        "Drizzle": "🌦️",
-        "Thunderstorm": "⛈️",
-        "Snow": "❄️"
-    }
-    return weather_to_emoji.get(weather_main, "🌙" if not is_daytime else "☀️")
+    return weather_emoji
 
 def get_weather_and_sun_times():
     weather_url = f"http://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={latitude},{longitude}&aqi=no"
