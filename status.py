@@ -37,7 +37,7 @@ def get_weather_emoji(weather_description, current_time, sunrise_time, sunset_ti
     elif "mist" in weather_description or "fog" in weather_description:
         weather_emoji = "🌫️"
     else:
-        weather_emoji = "🌈"
+        weather_emoji = "☀️" if sunrise_time <= current_time <= sunset_time else "🌙"
 
     return weather_emoji
 
