@@ -53,13 +53,13 @@ def get_weather_and_sun_times():
     return "Clear"
 
 def get_sun_times():
-    sun_url = f"https://api.sunrise-sunset.org/json?lat={latitude}&lng={longitude}&formatted=0"
+    sun_url = f"https://api.sunrisesunset.io/json?lat={latitude}&lng={longitude}"
     response = requests.get(sun_url)
     if response.status_code == 200:
         sun_data = response.json()
         try:
-            sunrise_time = datetime.fromisoformat(sun_data['results']['sunrise']).time()
-            sunset_time = datetime.fromisoformat(sun_data['results']['sunset']).time()
+            sunrise_time = datetime.strptime(sun_data['results']['sunrise'], '%I:%M:%S %p').time()
+            sunset_time = datetime.strptime(sun_data['results']['sunset'], '%I:%M:%S %p').time()
             return sunrise_time, sunset_time
         except (KeyError, ValueError) as e:
             print(f"Error parsing sun times data: {e}")
@@ -74,7 +74,7 @@ sunrise_time, sunset_time = get_sun_times()
 
 while True:
     current_time = get_current_time()
-    if time.time() - last_sun_update > 86400:  # Update sun times once a day
+    if time.time() - last_sun_update > 86400:
         sunrise_time, sunset_time = get_sun_times()
         last_sun_update = time.time()
     if time.time() - last_weather_update > 1800 or previous_status is None:
