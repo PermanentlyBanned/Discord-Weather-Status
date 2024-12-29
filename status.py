@@ -39,16 +39,14 @@ def get_weather_emoji(weather_main, current_time, sunrise_time, sunset_time):
     return weather_to_emoji.get(weather_main, "🌙" if not is_daytime else "☀️")
 
 def get_weather_and_sun_times():
-    weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&appid={weather_api_key}&units=metric"
+    weather_url = f"http://api.weatherapi.com/v1/current.json?key={weather_api_key}&q={latitude},{longitude}&aqi=no"
     response = requests.get(weather_url)
     if response.status_code == 200:
         weather_data = response.json()
         try:
-            weather_main = weather_data['weather'][0]['main']
-            sunrise_timestamp = weather_data['sys']['sunrise']
-            sunset_timestamp = weather_data['sys']['sunset']
-            sunrise_time = datetime.fromtimestamp(sunrise_timestamp, local_tz).time()
-            sunset_time = datetime.fromtimestamp(sunset_timestamp, local_tz).time()
+            weather_main = weather_data['current']['condition']['text']
+            sunrise_time = datetime.strptime(weather_data['forecast']['forecastday'][0]['astro']['sunrise'], '%I:%M %p').time()
+            sunset_time = datetime.strptime(weather_data['forecast']['forecastday'][0]['astro']['sunset'], '%I:%M %p').time()
             return weather_main, sunrise_time, sunset_time
         except (KeyError, ValueError) as e:
             print(f"Error parsing weather data: {e}")

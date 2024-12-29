@@ -1,10 +1,10 @@
-# Discord Wetter Status Bot
+# Discord Wetter Status
 
-Dieses Programm aktualisiert deinen Discord-Status mit dem aktuellen Wetter und der aktuellen Uhrzeit für einen bestimmten Ort. Es ruft Wetterdaten von der OpenWeatherMap API ab und aktualisiert deinen Discord-Status jede Minute.
+Dieses Programm aktualisiert deinen Discord-Status mit dem aktuellen Wetter und der aktuellen Uhrzeit für einen bestimmten Ort. Es ruft Wetterdaten von der WeatherAPI ab und aktualisiert deinen Discord-Status jede Minute.
 
 ## Funktionen
 
-- Ruft aktuelle Wetterdaten von der OpenWeatherMap API ab.
+- Ruft aktuelle Wetterdaten von der WeatherAPI ab.
 - Aktualisiert den Discord-Status mit Wetter-Emoji und aktueller Uhrzeit.
 - Konfigurierbarer Standort über Umgebungsvariablen.
 
@@ -13,7 +13,7 @@ Dieses Programm aktualisiert deinen Discord-Status mit dem aktuellen Wetter und 
 Die folgenden Umgebungsvariablen müssen gesetzt werden:
 
 - `DISCORD_TOKEN`: Dein Discord-Token.
-- `WEATHER_API_KEY`: Dein OpenWeatherMap API-Schlüssel.
+- `WEATHER_API_KEY`: Dein WeatherAPI-Schlüssel.
 - `LATITUDE`: Breitengrad des Standorts für Wetterdaten.
 - `LONGITUDE`: Längengrad des Standorts für Wetterdaten.
 
@@ -30,7 +30,7 @@ Die folgenden Umgebungsvariablen müssen gesetzt werden:
 2. **Konfiguriere Umgebungsvariablen**:
     - In der Coolify-Anwendungskonfiguration setze die folgenden Umgebungsvariablen:
         - `DISCORD_TOKEN`: Dein Discord-Token.
-        - `WEATHER_API_KEY`: Dein OpenWeatherMap API-Schlüssel.
+        - `WEATHER_API_KEY`: Dein WeatherAPI-Schlüssel.
         - `LATITUDE`: Breitengrad des Standorts für Wetterdaten.
         - `LONGITUDE`: Längengrad des Standorts für Wetterdaten.
 
