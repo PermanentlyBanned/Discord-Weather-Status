@@ -45,8 +45,8 @@ def get_weather_and_sun_times():
         weather_data = response.json()
         try:
             weather_main = weather_data['current']['condition']['text']
-            sunrise_time = datetime.strptime(weather_data['forecast']['forecastday'][0]['astro']['sunrise'], '%I:%M %p').time()
-            sunset_time = datetime.strptime(weather_data['forecast']['forecastday'][0]['astro']['sunset'], '%I:%M %p').time()
+            sunrise_time = weather_data['forecast']['forecastday'][0]['astro']['sunrise']
+            sunset_time = weather_data['forecast']['forecastday'][0]['astro']['sunset']
             return weather_main, sunrise_time, sunset_time
         except (KeyError, ValueError) as e:
             print(f"Error parsing weather data: {e}")
