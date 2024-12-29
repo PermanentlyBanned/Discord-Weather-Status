@@ -58,9 +58,9 @@ def get_sun_times():
     if response.status_code == 200:
         sun_data = response.json()
         try:
-            sunrise_time = datetime.strptime(sun_data['results']['sunrise'], '%I:%M:%S %p').time()
-            sunset_time = datetime.strptime(sun_data['results']['sunset'], '%I:%M:%S %p').time()
-            return sunrise_time, sunset_time
+            sunrise_time = datetime.strptime(sun_data['results']['sunrise'], '%I:%M:%S %p').strftime('%H:%M')
+            sunset_time = datetime.strptime(sun_data['results']['sunset'], '%I:%M:%S %p').strftime('%H:%M')
+            return datetime.strptime(sunrise_time, '%H:%M').time(), datetime.strptime(sunset_time, '%H:%M').time()
         except (KeyError, ValueError) as e:
             print(f"Error parsing sun times data: {e}")
     else:
