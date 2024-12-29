@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  python-app:
+    build: .
+    environment:
+      - DISCORD_TOKEN
+      - WEATHER_API_KEY
+      - LATITUDE
+      - LONGITUDE
+    volumes:
+      - .:/app
+    restart: always
