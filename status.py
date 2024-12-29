@@ -58,8 +58,8 @@ def get_sun_times():
     if response.status_code == 200:
         sun_data = response.json()
         try:
-            sunrise_time = datetime.fromisoformat(sun_data['results']['sunrise']).astimezone(local_tz).time()
-            sunset_time = datetime.fromisoformat(sun_data['results']['sunset']).astimezone(local_tz).time()
+            sunrise_time = datetime.fromisoformat(sun_data['results']['sunrise']).time()
+            sunset_time = datetime.fromisoformat(sun_data['results']['sunset']).time()
             return sunrise_time, sunset_time
         except (KeyError, ValueError) as e:
             print(f"Error parsing sun times data: {e}")
