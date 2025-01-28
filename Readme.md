@@ -38,6 +38,10 @@ Die folgenden Umgebungsvariablen müssen gesetzt werden:
     - Klicke auf "Deploy", um die Anwendung zu starten.
     - Coolify wird das Docker-Image bauen und den Container starten.
 
+## Koordinaten herausfinden
+Um deine eigenen Koordinaten (Breiten- und Längengrad) zu erhalten, kannst du beispielsweise
+[Google Maps](https://maps.google.com) oder [latlong.net](https://www.latlong.net/) verwenden.
+
 ## Lokal ausführen
 
 1. **Repository klonen**: Klone dieses Repository auf deinen lokalen Rechner.
