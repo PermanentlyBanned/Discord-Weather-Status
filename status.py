@@ -70,11 +70,21 @@ def change_status(token, message):
 def get_current_time():
     return datetime.now(local_tz).strftime("%H:%M")
 
-def wait_for_next_minute():
+def should_show_temperature():
     now = datetime.now(local_tz)
-    seconds_to_wait = 60 - now.second
-    if seconds_to_wait == 60:
-        seconds_to_wait = 0
+    return 15 <= now.second <= 45
+
+def wait_for_next_update():
+    now = datetime.now(local_tz)
+    current_second = now.second
+    
+    if current_second < 15:
+        seconds_to_wait = 25 - current_second
+    elif current_second < 35:
+        seconds_to_wait = 35 - current_second
+    else:
+        seconds_to_wait = 60 - current_second
+    
     time.sleep(seconds_to_wait)
 
 def get_weather_emoji(weather_description, current_time, sunrise_time, sunset_time):
@@ -140,7 +150,6 @@ def main():
     logging.info(f"Update interval: {update_interval}s, Weather update interval: {weather_update_interval}s")
     
     previous_status = None
-    previous_time = None
     last_weather_update = 0
     weather_description = "unknown"
     sunrise_time = None
@@ -152,36 +161,39 @@ def main():
     weather_description, sunrise_time, sunset_time, temperature = get_weather_and_sun_times()
     last_weather_update = time.time()
     
-    wait_for_next_minute()
+    wait_for_next_update()
     
     while True:
         try:
             current_time = get_current_time()
+            show_temp = should_show_temperature()
             
-            if current_time != previous_time:
-                if time.time() - last_weather_update > weather_update_interval:
-                    weather_description, sunrise_time, sunset_time, temperature = get_weather_and_sun_times()
-                    last_weather_update = time.time()
-                
-                current_time_obj = datetime.strptime(current_time, "%H:%M").time()
-                weather_emoji = get_weather_emoji(weather_description, current_time_obj, sunrise_time, sunset_time)
-                
-                status_message = status_message_format.format(
-                    weather_emoji=weather_emoji,
-                    current_time=current_time,
-                    temperature=f"{temperature}°C" if temperature else "",
-                    weather=weather_description
-                )
-                
-                if status_message != previous_status:
-                    if change_status(discord_token, status_message):
-                        previous_status = status_message
-                
-                previous_time = current_time
+            if time.time() - last_weather_update > weather_update_interval:
+                weather_description, sunrise_time, sunset_time, temperature = get_weather_and_sun_times()
+                last_weather_update = time.time()
+            
+            current_time_obj = datetime.strptime(current_time, "%H:%M").time()
+            weather_emoji = get_weather_emoji(weather_description, current_time_obj, sunrise_time, sunset_time)
+            
+            if show_temp and temperature is not None:
+                display_text = f"{temperature}°C"
+            else:
+                display_text = current_time
+            
+            status_message = status_message_format.format(
+                weather_emoji=weather_emoji,
+                current_time=display_text,
+                temperature=f"{temperature}°C" if temperature else "",
+                weather=weather_description
+            )
+            
+            if status_message != previous_status:
+                if change_status(discord_token, status_message):
+                    previous_status = status_message
             
             create_health_check()
             
-            wait_for_next_minute()
+            wait_for_next_update()
             
         except KeyboardInterrupt:
             break
