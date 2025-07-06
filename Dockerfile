@@ -10,9 +10,9 @@ RUN pip install --no-cache-dir requests pytz
 
 RUN apt-get remove -y gcc && apt-get autoremove -y
 
-RUN groupadd -r discordbot && useradd -r -g discordbot discordbot
+RUN groupadd -r discord && useradd -r -g discord discord
 
-RUN mkdir -p /tmp && chown discordbot:discordbot /tmp
+RUN mkdir -p /tmp && chown discord:discord /tmp
 
 USER discordbot
 
