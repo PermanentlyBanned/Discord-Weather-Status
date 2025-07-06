@@ -1,14 +1,31 @@
 version: '3.8'
 
 services:
-  python-app:
-    build: .
+  discord-weather-status:
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      - DISCORD_TOKEN=
-      - WEATHER_API_KEY=
-      - LATITUDE=
-      - LONGITUDE=
-      - STATUS_MESSAGE_FORMAT={weather_emoji} | {current_time}
-    volumes:
-      - .:/app
-    restart: always
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - WEATHER_API_KEY=${WEATHER_API_KEY}
+      - LATITUDE=${LATITUDE}
+      - LONGITUDE=${LONGITUDE}
+      - STATUS_MESSAGE_FORMAT=${STATUS_MESSAGE_FORMAT:-{weather_emoji} {current_time}}
+      - TIMEZONE=${TIMEZONE:-Europe/Berlin}
+      - UPDATE_INTERVAL=${UPDATE_INTERVAL:-60}
+      - WEATHER_UPDATE_INTERVAL=${WEATHER_UPDATE_INTERVAL:-1800}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os; exit(0 if os.path.exists('/tmp/health') else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
