@@ -1,4 +1,4 @@
-FROM python:3.12-slim as builder
+FROM python:3.12-slim
 
 WORKDIR /app
 
@@ -6,15 +6,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --user --no-cache-dir requests pytz
+RUN pip install --no-cache-dir requests pytz
 
-FROM python:3.12-slim
-
-WORKDIR /app
-
-COPY --from=builder /root/.local /root/.local
-
-ENV PATH=/root/.local/bin:$PATH
+RUN apt-get remove -y gcc && apt-get autoremove -y
 
 RUN groupadd -r discordbot && useradd -r -g discordbot discordbot
 
