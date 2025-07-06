@@ -4,7 +4,7 @@ import os
 import logging
 import signal
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import timezone
 
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -67,30 +67,13 @@ def change_status(token, message):
         logging.error(f"Failed to update status: {e}")
         return False
 
-def get_current_time():
-    return datetime.now(local_tz).strftime("%H:%M")
-
-def should_show_temperature():
-    now = datetime.now(local_tz)
-    return 25 <= now.second <= 35
-
-def wait_for_next_update():
-    now = datetime.now(local_tz)
-    current_second = now.second
-    
-    if current_second < 25:
-        seconds_to_wait = 25 - current_second
-    elif current_second <= 35:
-        seconds_to_wait = 36 - current_second
-    else:
-        seconds_to_wait = 60 - current_second + 25
-    
-    time.sleep(seconds_to_wait)
+def get_current_time_full():
+    return datetime.now(local_tz)
 
 def get_weather_emoji(weather_description, current_time, sunrise_time, sunset_time):
     weather_lower = weather_description.lower()
     
-    is_day = sunrise_time <= current_time <= sunset_time if sunrise_time and sunset_time else True
+    is_day = sunrise_time <= current_time.time() <= sunset_time if sunrise_time and sunset_time else True
     
     if "clear" in weather_lower or "sunny" in weather_lower:
         return "☀️" if is_day else "🌙"
@@ -161,23 +144,24 @@ def main():
     weather_description, sunrise_time, sunset_time, temperature = get_weather_and_sun_times()
     last_weather_update = time.time()
     
-    
     while True:
         try:
-            current_time = get_current_time()
-            show_temp = should_show_temperature()
+            now = get_current_time_full()
+            current_minute_start = now.replace(second=0, microsecond=0)
+            current_second = now.second
+            
+            show_temp = 25 <= current_second <= 35
             
             if time.time() - last_weather_update > weather_update_interval:
                 weather_description, sunrise_time, sunset_time, temperature = get_weather_and_sun_times()
                 last_weather_update = time.time()
             
-            current_time_obj = datetime.strptime(current_time, "%H:%M").time()
-            weather_emoji = get_weather_emoji(weather_description, current_time_obj, sunrise_time, sunset_time)
+            weather_emoji = get_weather_emoji(weather_description, now, sunrise_time, sunset_time)
             
             if show_temp and temperature is not None:
                 display_text = f"{temperature}°C"
             else:
-                display_text = current_time
+                display_text = now.strftime("%H:%M")
             
             status_message = status_message_format.format(
                 weather_emoji=weather_emoji,
@@ -192,8 +176,21 @@ def main():
             
             create_health_check()
             
-            wait_for_next_update()
+            if current_second < 25:
+                next_update_time = current_minute_start + timedelta(seconds=25)
+            elif current_second < 35: 
+                next_update_time = current_minute_start + timedelta(seconds=35)
+            elif current_second < 59: 
+                next_update_time = current_minute_start + timedelta(minutes=1)
+            else:
+                next_update_time = current_minute_start + timedelta(minutes=1)
             
+            sleep_duration = (next_update_time - datetime.now(local_tz)).total_seconds()
+            if sleep_duration > 0:
+                time.sleep(sleep_duration)
+            else:
+                time.sleep(0.1)
+
         except KeyboardInterrupt:
             break
         except Exception as e:
