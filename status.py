@@ -72,7 +72,7 @@ def get_current_time():
 
 def should_show_temperature():
     now = datetime.now(local_tz)
-    return 25 <= now.second <= 35
+    return 25 <= now.second <= 36
 
 def wait_for_next_update():
     now = datetime.now(local_tz)
@@ -80,8 +80,8 @@ def wait_for_next_update():
     
     if current_second < 25:
         seconds_to_wait = 25 - current_second
-    elif current_second < 35:
-        seconds_to_wait = 35 - current_second
+    elif current_second < 36:
+        seconds_to_wait = 36 - current_second
     else:
         seconds_to_wait = 60 - current_second
     
