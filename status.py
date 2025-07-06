@@ -72,7 +72,7 @@ def get_current_time():
 
 def should_show_temperature():
     now = datetime.now(local_tz)
-    return 25 <= now.second <= 36
+    return 25 <= now.second <= 35
 
 def wait_for_next_update():
     now = datetime.now(local_tz)
@@ -80,10 +80,10 @@ def wait_for_next_update():
     
     if current_second < 25:
         seconds_to_wait = 25 - current_second
-    elif current_second < 36:
+    elif current_second <= 35:
         seconds_to_wait = 36 - current_second
     else:
-        seconds_to_wait = 60 - current_second
+        seconds_to_wait = 60 - current_second + 25
     
     time.sleep(seconds_to_wait)
 
@@ -161,7 +161,6 @@ def main():
     weather_description, sunrise_time, sunset_time, temperature = get_weather_and_sun_times()
     last_weather_update = time.time()
     
-    wait_for_next_update()
     
     while True:
         try:
