@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir --user requests pytz
+RUN pip install --user --no-cache-dir requests pytz
 
 FROM python:3.12-slim
 
