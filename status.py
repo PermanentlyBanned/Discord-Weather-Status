@@ -26,7 +26,10 @@ def get_current_time():
 
 def get_weather_emoji(weather_description, current_time, sunrise_time, sunset_time):
     if "clear" in weather_description or "sunny" in weather_description:
-        return "☀️" if sunrise_time <= current_time <= sunset_time else "🌙"
+        if sunrise_time is not None and sunset_time is not None:
+            return "☀️" if sunrise_time <= current_time <= sunset_time else "🌙"
+        else:
+            return "☀️"  # Default to sun if no sunrise/sunset data
     elif "cloud" in weather_description or "overcast" in weather_description:
         return "☁️"
     elif "rain" in weather_description or "drizzle" in weather_description:
@@ -48,7 +51,10 @@ def get_weather_emoji(weather_description, current_time, sunrise_time, sunset_ti
     elif "smoke" in weather_description:
         return "🌫️"
     else:
-        return "☀️" if sunrise_time <= current_time <= sunset_time else "🌙"
+        if sunrise_time is not None and sunset_time is not None:
+            return "☀️" if sunrise_time <= current_time <= sunset_time else "🌙"
+        else:
+            return "☀️"  # Default to sun if no sunrise/sunset data
 
 def get_weather_and_sun_times():
     weather_url = f"http://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={latitude},{longitude}&days=1"
@@ -57,23 +63,45 @@ def get_weather_and_sun_times():
         response.raise_for_status()
         weather_data = response.json()
         weather_description = weather_data['current']['condition']['text'].lower()
+        temperature = weather_data['current']['temp_c']
         sunrise_time = datetime.strptime(weather_data['forecast']['forecastday'][0]['astro']['sunrise'], '%I:%M %p').time()
         sunset_time = datetime.strptime(weather_data['forecast']['forecastday'][0]['astro']['sunset'], '%I:%M %p').time()
-        return weather_description, sunrise_time, sunset_time
+        return weather_description, temperature, sunrise_time, sunset_time
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to fetch weather data: {e}")
-        return "unknown", None, None
+        return "unknown", None, None, None
 
 previous_time, previous_weather_emoji, last_weather_update = None, None, time.time()
+last_mode_switch = time.time()
+show_time_mode = True  # True for time mode, False for temperature mode
+
+# Initialize variables
+weather_description = "unknown"
+temperature = None
+sunrise_time = None
+sunset_time = None
 
 while True:
     current_time = get_current_time()
     if time.time() - last_weather_update > 1800 or previous_weather_emoji is None:
-        weather_description, sunrise_time, sunset_time = get_weather_and_sun_times()
+        weather_description, temperature, sunrise_time, sunset_time = get_weather_and_sun_times()
         last_weather_update = time.time()
+    
+    # Switch display mode every 15 seconds
+    if time.time() - last_mode_switch > 15:
+        show_time_mode = not show_time_mode
+        last_mode_switch = time.time()
+    
     current_time_obj = datetime.strptime(current_time, "%H:%M").time()
     weather_emoji = get_weather_emoji(weather_description, current_time_obj, sunrise_time, sunset_time)
-    status_message = status_message_format.format(weather_emoji=weather_emoji, current_time=current_time)
+    
+    # Create status message based on current mode
+    if show_time_mode:
+        status_message = f"{weather_emoji} {current_time}"
+    else:
+        temp_str = f"{temperature}°C" if temperature is not None else "N/A"
+        status_message = f"{weather_emoji} {temp_str}"
+    
     if status_message != previous_time:
         change_status(discord_token, status_message)
         previous_time = status_message

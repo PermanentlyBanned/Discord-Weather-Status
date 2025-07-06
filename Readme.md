@@ -1,11 +1,13 @@
 # Discord Wetter Status
 
-Dieses Programm aktualisiert deinen Discord-Status mit dem aktuellen Wetter und der aktuellen Uhrzeit für einen bestimmten Ort. Es ruft Wetterdaten von der WeatherAPI ab und aktualisiert deinen Discord-Status jede Minute.
+Dieses Programm aktualisiert deinen Discord-Status mit dem aktuellen Wetter und wechselt alle 15 Sekunden zwischen der Anzeige von Zeit und Temperatur für einen bestimmten Ort. Es ruft Wetterdaten von der WeatherAPI ab und aktualisiert deinen Discord-Status kontinuierlich.
 
 ## Funktionen
 
 - Ruft aktuelle Wetterdaten von der WeatherAPI ab.
-- Aktualisiert den Discord-Status mit Wetter-Emoji und aktueller Uhrzeit.
+- Wechselt alle 15 Sekunden zwischen zwei Anzeigemodi:
+  - **Zeit-Modus**: Zeigt Wetter-Emoji und aktuelle Uhrzeit an
+  - **Temperatur-Modus**: Zeigt Wetter-Emoji und aktuelle Temperatur an
 - Konfigurierbarer Standort über Umgebungsvariablen.
 
 ## Umgebungsvariablen
