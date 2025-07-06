@@ -73,8 +73,9 @@ def get_current_time():
 def wait_for_next_minute():
     now = datetime.now(local_tz)
     seconds_to_wait = 60 - now.second
-    if seconds_to_wait == 60:
+    if now.second == 0:
         seconds_to_wait = 0
+    logging.debug(f"Waiting {seconds_to_wait} seconds until next minute")
     time.sleep(seconds_to_wait)
 
 def get_weather_emoji(weather_description, current_time, sunrise_time, sunset_time):

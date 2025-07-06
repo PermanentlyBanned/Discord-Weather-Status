@@ -14,7 +14,7 @@ RUN groupadd -r discord && useradd -r -g discord discord
 
 RUN mkdir -p /tmp && chown discord:discord /tmp
 
-USER discordbot
+USER discord
 
 COPY status.py ./
 
